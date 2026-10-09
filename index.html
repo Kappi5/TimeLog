@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f2328">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stunden & Kasse">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<title>Baustellen-Stunden & Kasse</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{--bg:#e9e7e2;--card:#fbfaf8;--ink:#1f2328;--mute:#6b6f76;--line:#d9d6cf;--yel:#f2b705;--yelink:#1f2328;--ok:#2f7d4f;--open:#c4412b;--hero:#1f2328;--heroink:#f4f2ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15171a;--card:#202327;--ink:#eceae5;--mute:#9a9ea5;--line:#34383d;--hero:#0e0f11;--ok:#4fae78;--open:#e5654d}}
+:root[data-theme="dark"]{--bg:#15171a;--card:#202327;--ink:#eceae5;--mute:#9a9ea5;--line:#34383d;--hero:#0e0f11;--ok:#4fae78;--open:#e5654d}
+*{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 Barlow,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+.app{max-width:480px;margin:0 auto;padding:0 16px 96px}
+h1,h2,h3,.num{font-family:"Barlow Condensed","Arial Narrow",sans-serif;margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;padding:18px 2px 12px}
+.top h1{font-size:24px;font-weight:700;letter-spacing:.2px}
+.top small{color:var(--mute);font-size:13px}
+.hero{background:var(--hero);color:var(--heroink);border-radius:18px;padding:24px 20px 20px;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:repeating-linear-gradient(-45deg,var(--yel) 0 14px,#1f2328 14px 28px)}
+.hero .state{font-size:14px;color:#b9bcc2;margin-top:6px}
+.clock{font:600 76px/1 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums;letter-spacing:1px;margin:10px 0 4px}
+.btn{appearance:none;border:0;border-radius:14px;font:600 17px Barlow,sans-serif;padding:16px;width:100%;cursor:pointer;min-height:54px}
+.btn:active{transform:scale(.98)}
+.btn:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--yel);outline-offset:2px}
+.go{background:var(--yel);color:var(--yelink);font-size:20px;margin-top:14px}
+.stop{background:var(--open);color:#fff;font-size:20px;margin-top:14px}
+.ghost{background:transparent;color:inherit;border:1.5px solid var(--line)}
+.hero .ghost{border-color:#454a51;color:var(--heroink);margin-top:10px;font-size:15px;padding:12px;min-height:46px}
+.dark{background:var(--ink);color:var(--bg)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-top:14px}
+.card h2{font-size:21px;font-weight:600}
+.sum{display:flex;gap:0;margin-top:14px;background:var(--card);border:1px solid var(--line);border-radius:16px}
+.sum div{flex:1;padding:14px 16px}
+.sum div+div{border-left:1px solid var(--line)}
+.sum .num{font-size:30px;font-weight:600;line-height:1.1}
+.sum span{font-size:13px;color:var(--mute)}
+.item{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-top:1px solid var(--line);cursor:pointer;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left;color:inherit;font:inherit}
+.item:first-of-type{border-top:0}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--open)}
+.dot.ok{background:var(--ok)}
+.item b{font-weight:600;display:block}
+.item small{color:var(--mute);font-size:13px}
+.item .r{text-align:right}
+.item .r b{font:600 20px "Barlow Condensed",sans-serif}
+.ok-t{color:var(--ok)}.open-t{color:var(--open)}
+.empty{color:var(--mute);padding:10px 0 4px}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+.tabs div{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(3,1fr)}
+.tab{background:none;border:0;padding:14px 4px;font:600 15px Barlow,sans-serif;color:var(--mute);cursor:pointer;border-top:3px solid transparent}
+.tab[aria-selected=true]{color:var(--ink);border-top-color:var(--yel)}
+.view{display:none}.view.on{display:block}
+label{display:block;font-size:13px;font-weight:600;color:var(--mute);margin:14px 0 5px}
+input,select{width:100%;font:inherit;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);min-height:48px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:40;display:none;align-items:flex-end;justify-content:center}
+.scrim.on{display:flex}
+.sheet{background:var(--card);width:100%;max-width:520px;max-height:92%;overflow-y:auto;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom,0px))}
+.sheet h3{font-size:26px;font-weight:600}
+.wheel{position:relative;height:120px;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.wheel:before{content:"";position:absolute;left:0;right:0;top:40px;height:40px;background:rgba(242,183,5,.22);border-block:2px solid var(--yel);pointer-events:none}
+.wheel ul{height:100%;overflow-y:scroll;scroll-snap-type:y mandatory;padding:40px 0;margin:0;list-style:none;scrollbar-width:none}
+.wheel ul::-webkit-scrollbar{display:none}
+.wheel li{height:40px;scroll-snap-align:center;display:grid;place-items:center;font:600 22px "Barlow Condensed",sans-serif}
+.chk{display:flex;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:15px;font-weight:400;color:var(--ink);margin:0}
+.chk input{width:22px;min-height:22px;height:22px;accent-color:var(--ink)}
+.chk span{flex:1}
+.note{font-size:13px;color:var(--mute);margin:8px 0 0}
+#print{display:none}
+@media print{body>*:not(#print){display:none!important}#print{display:block;padding:8mm;font:12px Barlow,Arial,sans-serif;color:#000}#print table{width:100%;border-collapse:collapse;margin-top:14px}#print th,#print td{border-bottom:1px solid #999;padding:5px 4px;text-align:left}#print td.n,#print th.n{text-align:right}#print h1{font-size:26px}}
+</style>
+<style>#auth{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto}</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div><h1>Baustellen-Stunden & Kasse</h1><small id="who"></small></div></div>
+
+  <section class="view on" id="v-heute">
+    <div class="hero">
+      <div class="state" id="state">Nicht gestartet</div>
+      <div class="clock" id="clock">00:00:00</div>
+      <button class="btn go" id="main">Arbeit starten</button>
+      <button class="btn ghost" id="fix">Früher begonnen? Startzeit korrigieren</button>
+    </div>
+    <div class="sum"><div><span>Netto heute</span><div class="num" id="tH">0:00 h</div></div><div><span>Verdienst heute</span><div class="num" id="tE">0,00 €</div></div></div>
+    <div class="card"><h2>Etappen heute</h2><div id="today"></div><button class="btn ghost" id="add" style="margin-top:10px">+ Etappe hinzufügen</button></div>
+  </section>
+
+  <section class="view" id="v-verlauf">
+    <div class="sum"><div><span>Noch offen</span><div class="num open-t" id="hSaldo">0,00 €</div></div><div><span>Offene Stunden</span><div class="num" id="hOpen">0:00 h</div></div></div>
+    <div class="row2" style="margin-top:12px"><button class="btn dark" id="pay">Zahlung buchen</button><button class="btn go" id="pdf" style="margin-top:0">PDF erstellen</button></div>
+    <div class="card"><h2>Erfasste Stunden</h2><div id="hist"></div></div>
+    <div class="card"><h2>Zahlungen</h2><div id="pays"></div><p class="note">Zahlungen werden automatisch mit den ältesten offenen Stunden verrechnet.</p></div>
+  </section>
+
+  <section class="view" id="v-set">
+    <div class="card"><h2>Mein Name</h2><input id="name" placeholder="Vor- und Nachname"></div>
+    <div class="card"><h2>Arbeitgeber und Stundenlohn</h2><div id="emps"></div>
+      <label for="eN">Neuer Arbeitgeber</label><input id="eN" placeholder="Firmenname">
+      <label for="eR">Stundenlohn in €</label><input id="eR" inputmode="decimal" placeholder="25,00">
+      <button class="btn dark" id="eAdd" style="margin-top:14px">Arbeitgeber speichern</button></div>
+    <div class="card"><h2>Daten</h2><p class="note" style="margin:0 0 10px">Deine Daten liegen in der Cloud und sind nur mit deiner Anmeldung zugänglich.</p><button class="btn ghost" id="reset">Abmelden</button></div>
+  </section>
+</div>
+
+<nav class="tabs"><div role="tablist">
+  <button class="tab" role="tab" data-v="heute" aria-selected="true">Heute</button>
+  <button class="tab" role="tab" data-v="verlauf" aria-selected="false">Verlauf</button>
+  <button class="tab" role="tab" data-v="set" aria-selected="false">Einstellungen</button>
+</div></nav>
+
+<div id="auth"><div class="app" style="padding-top:48px"><h1 style="font-size:36px;line-height:1.05">Baustellen-Stunden & Kasse</h1><p class="note" style="font-size:15px">Melde dich an, damit deine Stunden sicher in der Cloud gespeichert sind.</p><div class="card"><label for="ae">E-Mail</label><input id="ae" type="email" autocomplete="email"><label for="ap">Passwort (mindestens 6 Zeichen)</label><input id="ap" type="password" autocomplete="current-password"><p class="note" id="am"></p><button class="btn go" id="ain">Anmelden</button><button class="btn ghost" id="aup" style="margin-top:10px">Neu registrieren</button></div></div></div>
+<div class="scrim" id="scrim"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="print"></div>
+
+<script>
+const $=s=>document.querySelector(s), KEY='bsk-v1';
+const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const eur=n=>n.toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+const hh=m=>Math.floor(m/60)+':'+String(Math.round(m%60)).padStart(2,'0')+' h';
+const p2=n=>String(n).padStart(2,'0'), uid=()=>crypto.randomUUID();
+const iso=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const hm=d=>p2(d.getHours())+':'+p2(d.getMinutes());
+const tm=s=>{const[a,b]=s.split(':').map(Number);return a*60+b};
+const dl=s=>new Date(s+'T12:00').toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit'});
+const todayIso=()=>iso(new Date());
+const dAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return iso(d)};
+
+function seed(){const a={id:uid(),name:'Bau-Tech GmbH',rate:25},b={id:uid(),name:'Elektro Müller',rate:28};
+ return{name:'',timer:null,employers:[a,b],payments:[{id:uid(),date:dAgo(1),amount:150}],entries:[
+ {id:uid(),date:dAgo(3),start:'07:00',end:'12:00',pause:15,task:'Rohinstallation Kabel',place:'Westring',emp:a.id},
+ {id:uid(),date:dAgo(2),start:'07:30',end:'15:30',pause:30,task:'Verteilerkasten montiert',place:'Hauptstraße 12',emp:b.id},
+ {id:uid(),date:dAgo(1),start:'08:00',end:'13:00',pause:20,task:'Steckdosen angeschlossen',place:'Westring',emp:a.id}]}}
+const sb=supabase.createClient('https://hhzitscmhnlofneetevh.supabase.co','sb_publishable_Dw606zdzkBYbrK88VPW8uQ_mg6akw3Y');
+let T=null;try{T=JSON.parse(localStorage.getItem('bsk-timer'))}catch(e){}
+let S={uid:null,name:'',timer:T,employers:[],entries:[],payments:[]},nt;
+const save=()=>{try{localStorage.setItem('bsk-timer',JSON.stringify(S.timer))}catch(e){}};
+const run=async f=>{try{await f()}catch(x){alert('Das hat nicht geklappt: '+(x.message||x))}};
+async function loadAll(){
+ const r=await Promise.all([sb.from('employers').select('*').order('created_at'),sb.from('time_entries').select('*'),sb.from('payments').select('*'),sb.from('profiles').select('full_name').maybeSingle()]);
+ r.forEach(x=>{if(x.error)throw x.error});
+ S.employers=r[0].data.map(x=>({id:x.id,name:x.name,rate:+x.hourly_rate}));
+ S.entries=r[1].data.map(x=>({id:x.id,date:x.work_date,start:x.start_time.slice(0,5),end:x.end_time.slice(0,5),pause:x.pause_minutes,task:x.task,place:x.place,emp:x.employer_id,rate:+x.hourly_rate}));
+ S.payments=r[2].data.map(x=>({id:x.id,date:x.paid_on,amount:+x.amount}));
+ S.name=(r[3].data&&r[3].data.full_name)||'';}
+const er=e=>e.rate??emp(e.emp).rate;
+const emp=id=>S.employers.find(e=>e.id===id)||{name:'Unbekannt',rate:0};
+const net=e=>Math.max(0,tm(e.end)-tm(e.start)-e.pause);
+
+// FIFO: Zahlungen gegen die ältesten Einträge
+function fifo(){let pool=S.payments.reduce((s,p)=>s+p.amount,0),m={};
+ [...S.entries].sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start)).forEach(e=>{
+  const earn=net(e)/60*er(e),paid=Math.min(earn,pool);pool-=paid;
+  m[e.id]={earn,paid,rest:earn-paid,done:earn-paid<0.005}});return m}
+
+// Wecker-Rädchen
+function wheel(el,vals,idx,fmt,cb){el.innerHTML='<ul>'+vals.map(v=>'<li>'+fmt(v)+'</li>').join('')+'</ul>';
+ const u=el.firstChild;requestAnimationFrame(()=>u.scrollTop=idx*40);
+ u.addEventListener('scroll',()=>{el._i=Math.max(0,Math.min(vals.length-1,Math.round(u.scrollTop/40)));el._v=vals[el._i];cb&&cb(el._v)},{passive:true});
+ el._i=idx;el._v=vals[idx]}
+const steps=(max)=>Array.from({length:max/5+1},(_,i)=>i*5);
+
+function sheet(html){$('#sheet').innerHTML=html;$('#scrim').classList.add('on')}
+function closeSheet(){$('#scrim').classList.remove('on')}
+$('#scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeSheet()});
+
+// Timer
+let tick;
+function drawTimer(){const t=S.timer,run=!!t;
+ $('#main').textContent=run?'Stopp und Etappe speichern':'Arbeit starten';
+ $('#main').className='btn '+(run?'stop':'go');
+ $('#state').textContent=run?'Läuft seit '+hm(new Date(t)):'Nicht gestartet';
+ clearInterval(tick);const f=()=>{const s=run?Math.max(0,Math.floor((Date.now()-t)/1000)):0;
+  $('#clock').textContent=p2(Math.floor(s/3600))+':'+p2(Math.floor(s%3600/60))+':'+p2(s%60)};f();if(run)tick=setInterval(f,1000)}
+$('#main').onclick=()=>{if(!S.timer){S.timer=Date.now();save();render()}else entrySheet({date:todayIso(),start:hm(new Date(S.timer)),end:hm(new Date()),pause:0},true)};
+$('#fix').onclick=()=>{
+ sheet(`<h3>Startzeit korrigieren</h3><label for="st">Startzeit (Uhr)</label><input type="time" id="st" style="font-size:22px"><label>Oder: vor wie vielen Minuten?</label><div class="wheel" id="w"></div><p class="note" id="pv"></p>
+ <div class="row2" style="margin-top:14px"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn go" id="ok" style="margin-top:0">Übernehmen</button></div>`);
+ const setT=m=>$('#st').value=hm(new Date(Date.now()-m*60000));
+ wheel($('#w'),steps(240),6,v=>v+' Min.',setT);setT(30);
+ $('#ok').onclick=()=>{const[a,b]=($('#st').value||'').split(':').map(Number),d=new Date();d.setHours(a,b,0,0);
+  if(isNaN(d.getTime())||d.getTime()>Date.now()){$('#pv').textContent='Die Startzeit muss heute und vor der aktuellen Uhrzeit liegen.';return}
+  S.timer=d.getTime();save();closeSheet();render()}};
+
+// Eintrag erfassen / bearbeiten
+function entrySheet(e,fromTimer){
+ const edit=!!e.id,opts=S.employers.map(x=>`<option value="${x.id}" ${x.id===e.emp?'selected':''}>${esc(x.name)} (${x.rate.toLocaleString('de-DE')} €/h)</option>`).join('');
+ sheet(`<h3>${edit?'Eintrag bearbeiten':'Etappe speichern'}</h3>
+ <label for="fd">Datum</label><input type="date" id="fd" value="${e.date}">
+ <div class="g2"><div><label for="fs">Von</label><input type="time" id="fs" value="${e.start}"></div><div><label for="fe">Bis</label><input type="time" id="fe" value="${e.end}"></div></div>
+ <label>Pause in Minuten</label><div class="wheel" id="wp"></div>
+ <label for="ft">Tätigkeit</label><input id="ft" placeholder="z. B. Steckdosen angeschlossen" value="${esc(e.task||'')}">
+ <label for="fo">Ort / Baustelle</label><input id="fo" placeholder="z. B. Schillerstraße 4" value="${esc(e.place||'')}">
+ <label for="fa">Arbeitgeber</label><select id="fa">${opts}</select>
+ <p class="note" id="fn"></p>
+ <div class="row2" style="margin-top:14px"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn go" id="fsave" style="margin-top:0">Speichern</button></div>
+ ${edit?'<button class="btn ghost open-t" id="fdel" style="margin-top:10px">Eintrag löschen</button>':''}`);
+ wheel($('#wp'),steps(60),Math.round((e.pause||0)/5),v=>v+' Min.',calc);
+ const calc=()=>{const n=tm($('#fe').value)-tm($('#fs').value)-($('#wp')._v||0),r=emp($('#fa').value).rate;
+  $('#fn').textContent=n>0?'Netto '+hh(n)+' · Verdienst '+eur(n/60*r):'Ende muss nach dem Start liegen.'};
+ ['#fs','#fe','#fa'].forEach(s=>$(s).addEventListener('input',calc));calc();
+ $('#fsave').onclick=()=>run(async()=>{const o={id:e.id||uid(),date:$('#fd').value,start:$('#fs').value,end:$('#fe').value,pause:$('#wp')._v||0,task:$('#ft').value.trim(),place:$('#fo').value.trim(),emp:$('#fa').value};
+  if(!o.emp||!o.date||!o.start||!o.end||net(o)<=0){$('#fn').textContent='Bitte Datum, Zeiten und Arbeitgeber prüfen. Die Nettozeit muss über 0 liegen.';return}
+  o.rate=(edit&&e.emp===o.emp&&e.rate)?e.rate:emp(o.emp).rate;const{error}=await sb.from('time_entries').upsert({id:o.id,employer_id:o.emp,work_date:o.date,start_time:o.start,end_time:o.end,pause_minutes:o.pause,task:o.task,place:o.place,hourly_rate:o.rate});if(error)throw error;if(fromTimer){S.timer=null;save()}closeSheet();await loadAll();render()});
+ if(edit)$('#fdel').onclick=()=>run(async()=>{const{error}=await sb.from('time_entries').delete().eq('id',e.id);if(error)throw error;closeSheet();await loadAll();render()})}
+$('#add').onclick=()=>{if(!S.employers.length)return alert('Lege zuerst unter Einstellungen einen Arbeitgeber an.');const n=new Date();entrySheet({date:todayIso(),start:'07:00',end:hm(n),pause:0})};
+
+// Zahlung
+$('#pay').onclick=()=>{sheet(`<h3>Zahlung buchen</h3><label for="pa">Erhaltener Betrag in €</label><input id="pa" inputmode="decimal" placeholder="150,00"><label for="pd">Datum</label><input type="date" id="pd" value="${todayIso()}"><p class="note" id="pn"></p>
+ <div class="row2" style="margin-top:14px"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn go" id="ps" style="margin-top:0">Buchen</button></div>`);
+ $('#ps').onclick=()=>run(async()=>{const a=parseFloat($('#pa').value.replace(',','.'));if(!(a>0)){$('#pn').textContent='Bitte einen Betrag über 0 € eingeben.';return}
+  const{error}=await sb.from('payments').insert({paid_on:$('#pd').value,amount:a});if(error)throw error;closeSheet();await loadAll();render()});};
+
+// PDF
+$('#pdf').onclick=()=>{
+ if(!S.employers.length)return;const f=fifo();
+ sheet(`<h3>PDF-Nachweis</h3><p class="note">Ein Nachweis enthält immer nur einen Arbeitgeber.</p>
+ <label for="xe">Arbeitgeber</label><select id="xe">${S.employers.map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select>
+ <label for="xo">Baustelle</label><select id="xo"></select>
+ <label>Einträge</label><div id="xl"></div>
+ <div class="row2" style="margin-top:14px"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn go" id="xg" style="margin-top:0">PDF erstellen</button></div>`);
+ const list=()=>{const id=$('#xe').value,pl=$('#xo').value,sel=S.entries.filter(e=>e.emp===id);
+  const places=[...new Set(sel.map(e=>e.place).filter(Boolean))];
+  if(event&&event.target&&event.target.id==='xe'||!$('#xo').options.length)$('#xo').innerHTML='<option value="">Alle Baustellen</option>'+places.map(p=>`<option>${esc(p)}</option>`).join('');
+  const rows=sel.filter(e=>!$('#xo').value||e.place===$('#xo').value).sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+  $('#xl').innerHTML=rows.length?rows.map(e=>`<label class="chk"><input type="checkbox" value="${e.id}" ${f[e.id].done?'':'checked'}><span>${dl(e.date)} · ${esc(e.task||'Ohne Beschreibung')}<br><small style="color:var(--mute)">${hh(net(e))} · ${eur(f[e.id].earn)} · ${f[e.id].done?'bezahlt':'offen'}</small></span></label>`).join(''):'<p class="empty">Keine Einträge für diesen Arbeitgeber.</p>'};
+ $('#xe').onchange=list;$('#xo').onchange=list;list();
+ $('#xg').onclick=()=>{const ids=[...document.querySelectorAll('#xl input:checked')].map(i=>i.value);if(!ids.length)return;
+  const e0=emp($('#xe').value),rows=S.entries.filter(e=>ids.includes(e.id)).sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+  const h=rows.reduce((s,e)=>s+net(e),0),earn=rows.reduce((s,e)=>s+f[e.id].earn,0),rest=rows.reduce((s,e)=>s+f[e.id].rest,0);
+  $('#print').innerHTML=`<h1>Stundennachweis</h1><p><b>Mitarbeiter:</b> ${esc(S.name||'–')}<br><b>Arbeitgeber:</b> ${esc(e0.name)}<br><b>Stundenlohn:</b> ${eur(e0.rate)}<br><b>Erstellt am:</b> ${new Date().toLocaleDateString('de-DE')}</p>
+  <table><tr><th>Datum</th><th>Von–Bis</th><th class="n">Netto</th><th>Tätigkeit</th><th>Ort</th><th class="n">Verdienst</th></tr>${rows.map(e=>`<tr><td>${new Date(e.date+'T12:00').toLocaleDateString('de-DE')}</td><td>${e.start}–${e.end}</td><td class="n">${hh(net(e))}</td><td>${esc(e.task)}</td><td>${esc(e.place)}</td><td class="n">${eur(f[e.id].earn)}</td></tr>`).join('')}
+  <tr><th colspan="2">Summe</th><th class="n">${hh(h)}</th><th colspan="2"></th><th class="n">${eur(earn)}</th></tr></table>
+  <p style="text-align:right;font-size:15px"><b>Offener Saldo: ${eur(rest)}</b></p>`;
+  closeSheet();makePdf(e0,rows,f,h,earn,rest)}};
+async function makePdf(e0,rows,f,h,earn,rest){
+ const J=window.jspdf,E=n=>eur(n).replace(/\s/g,' ');if(!J){window.print();return}
+ const d=new J.jsPDF({unit:'mm',format:'a4'});
+ d.setFontSize(18);d.text('Stundennachweis',14,18);d.setFontSize(10);
+ d.text(['Mitarbeiter: '+(S.name||'-'),'Arbeitgeber: '+e0.name,'Stundenlohn: '+E(e0.rate)+' pro Stunde','Erstellt am: '+new Date().toLocaleDateString('de-DE')],14,26);
+ d.autoTable({startY:46,head:[['Datum','Von-Bis','Netto','Tätigkeit','Ort','Verdienst']],
+  body:rows.map(e=>[new Date(e.date+'T12:00').toLocaleDateString('de-DE'),e.start+'-'+e.end,hh(net(e)),e.task,e.place,E(f[e.id].earn)]),
+  foot:[['Summe','',hh(h),'','',E(earn)]],styles:{fontSize:9},headStyles:{fillColor:[31,35,40]},footStyles:{fillColor:[233,231,226],textColor:20},
+  columnStyles:{2:{halign:'right'},5:{halign:'right'}}});
+ d.setFontSize(12);d.text('Offener Saldo: '+E(rest),196,d.lastAutoTable.finalY+10,{align:'right'});
+ const name='Stundennachweis_'+e0.name.replace(/\W+/g,'_')+'_'+todayIso()+'.pdf';
+ try{const dl=window.claude?await claude.use('downloads'):null;if(dl)await dl.save({filename:name,data:d.output('arraybuffer')});else d.save(name)}
+ catch(x){if(!x||x.code!=='declined')alert('Der PDF-Download ist in dieser Ansicht nicht möglich.')}}
+
+// Einstellungen
+$('#name').oninput=e=>{S.name=e.target.value;clearTimeout(nt);nt=setTimeout(()=>sb.from('profiles').upsert({user_id:S.uid,full_name:S.name}),700);$('#who').textContent=S.name||'Mitarbeiter'};
+$('#eAdd').onclick=()=>run(async()=>{const n=$('#eN').value.trim(),r=parseFloat($('#eR').value.replace(',','.'));if(!n||!(r>0))return alert('Bitte Name und Stundenlohn über 0 € eingeben.');
+ const{error}=await sb.from('employers').insert({name:n,hourly_rate:r});if(error)throw error;$('#eN').value=$('#eR').value='';await loadAll();render()});
+$('#reset').onclick=()=>sb.auth.signOut();
+window.delEmp=id=>{if(S.entries.some(e=>e.emp===id))return alert('Dieser Arbeitgeber hat noch Einträge und kann nicht gelöscht werden.');run(async()=>{const{error}=await sb.from('employers').delete().eq('id',id);if(error)throw error;await loadAll();render()})};
+window.editEntry=id=>entrySheet(S.entries.find(e=>e.id===id));
+
+// Render
+function itemHtml(e,f){const x=f[e.id],r=emp(e.emp);
+ return `<button class="item" onclick="editEntry('${e.id}')"><span class="dot ${x.done?'ok':''}" title="${x.done?'Bezahlt':'Offen'}"></span><span><b>${esc(e.task||'Ohne Beschreibung')}</b><small>${dl(e.date)} · ${e.start}–${e.end} · ${esc(e.place||'ohne Ort')}<br>${esc(r.name)}</small></span><span class="r"><b>${hh(net(e))}</b><small class="${x.done?'ok-t':'open-t'}">${x.done?'bezahlt':'offen '+eur(x.rest)}</small></span></button>`}
+function render(){const f=fifo(),t=todayIso(),all=[...S.entries].sort((a,b)=>(b.date+b.start).localeCompare(a.date+a.start));
+ $('#who').textContent=S.name||'Mitarbeiter';$('#name').value=S.name;
+ drawTimer();
+ const td=all.filter(e=>e.date===t);
+ $('#tH').textContent=hh(td.reduce((s,e)=>s+net(e),0));$('#tE').textContent=eur(td.reduce((s,e)=>s+f[e.id].earn,0));
+ $('#today').innerHTML=td.length?td.map(e=>itemHtml(e,f)).join(''):'<p class="empty">Noch keine Etappe heute. Starte die Zeit oder füge eine Etappe hinzu.</p>';
+ const open=all.filter(e=>!f[e.id].done);
+ $('#hSaldo').textContent=eur(open.reduce((s,e)=>s+f[e.id].rest,0));$('#hOpen').textContent=hh(open.reduce((s,e)=>s+net(e),0));
+ $('#hist').innerHTML=all.length?all.map(e=>itemHtml(e,f)).join(''):'<p class="empty">Noch keine Einträge.</p>';
+ $('#pays').innerHTML=S.payments.length?[...S.payments].sort((a,b)=>b.date.localeCompare(a.date)).map(p=>`<div class="item" style="grid-template-columns:1fr auto;cursor:default"><span>${dl(p.date)}</span><b class="ok-t num" style="font-size:20px">${eur(p.amount)}</b></div>`).join(''):'<p class="empty">Noch keine Zahlung gebucht.</p>';
+ $('#emps').innerHTML=S.employers.length?S.employers.map(e=>`<div class="item" style="grid-template-columns:1fr auto auto;cursor:default"><b>${esc(e.name)}</b><span>${eur(e.rate)}/h</span><button class="btn ghost" style="width:auto;min-height:40px;padding:6px 12px;font-size:14px" onclick="delEmp('${e.id}')">Löschen</button></div>`).join(''):'<p class="empty">Lege deinen ersten Arbeitgeber an.</p>'}
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));window.scrollTo(0,0)});
+const am=t=>$('#am').textContent=t;
+async function doAuth(up){const email=$('#ae').value.trim(),password=$('#ap').value;
+ if(!email||password.length<6)return am('Bitte E-Mail und ein Passwort mit mindestens 6 Zeichen eingeben.');
+ am('Einen Moment ...');
+ const r=up?await sb.auth.signUp({email,password}):await sb.auth.signInWithPassword({email,password});
+ if(r.error)return am((up?'Registrierung':'Anmeldung')+' fehlgeschlagen: '+r.error.message);
+ if(up&&!r.data.session)am('Fast geschafft: Bestätige die E-Mail in deinem Postfach und melde dich dann an.')}
+$('#ain').onclick=()=>doAuth(false);$('#aup').onclick=()=>doAuth(true);
+sb.auth.onAuthStateChange((_e,ses)=>{
+ if(ses){S.uid=ses.user.id;$('#auth').style.display='none';setTimeout(()=>run(async()=>{await loadAll();render()}),0)}
+ else{S.uid=null;S.employers=[];S.entries=[];S.payments=[];S.name='';$('#auth').style.display='block';render()}});
+render();
+</script>
+</body>
+</html>
