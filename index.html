@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1f2328">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAFSUlEQVR4nO3dMY7UShCH8V7EPQg2QUIEm3ImjsOZSAkQIXch6JWxdre8bbu761/V3y99SM8uf1P2zHszPHx6/FyAt3zwPgDoIg6YiAMm4oCJOGAiDpiIAybigIk4YCIOmIgDJuKAiThgIg6YiAMm4oCJOGAiDpiIAybigIk4YCIOmIgDJuKAiThgIg6YiAMm4oCJOGD66H0Abn7/+Nv+h79+fxx3JLIeFvkJhlMptFghl8xxdA/CkjWUhHFMa+K1ZJWkisMxi700iWSIQ6SJ16JXEjsO2Sz24iYSNY4QWexFTCTkh2DhyigxjznY5og44hcCrZBImyNBGSXUWcTYHIEG2k5/hQSIY1wZjZfH/QC8qMfR8cJ0vBKaR9Wdbhy9LsDQ6Yc4yMtE47g/9MnjDnfALRTjuDloxynHPfI3ycVxZ74iw01wCpVWHJfHKjXTKsG5CMVxbZo6o3xT6JNS+YQ09BAPXDtCkQ/9JOLIWkYVt4+Q//d5xyz+/Pp58E+/PH3r8m+pB6xwvU/x3xxnRxZlYbx29sjdY3KOY50yqlh9eMaxWhlVoD78byuNcpRRRTkXtzgW/zbiqTPyWh4+cSxeRqXfh/ptJWsZlfjZOcTR/iIQn10X7ec4f3nMjsP9vXtok6ene1tZYW1Usmc6NQ5uKBbNm4vi5litjErwrOfFwdNGL9MmKbc5BF9A06idu1wc0DEpjsZNqPbSmc/9S3h7bA6YZsTB2jhFZ3mwOWBSiYO1sScyjeFx8PHGOKNnq7I5IEgiDpEtKkVhJhJxQNPYOHjgGG3ohP03h8L+1OQ+Gf84IIs4YCIOmIgDpoFx8FZljnFzdt4c7g/k4nznw20FJuKAiThgIo4jf379PP7RsNyI433LJhLy1wRdbH30+olBfavH8eJKt2yI+mdWSITbyn+n7h0r3GuI45bciRDHszvXOGsixNFNvkSI49mXp29dnjEzJRLs561H65vI/UrS/rx13P/i2iuRMmWRjJvz6p9zHNj6uH91g340wjPH+5Z9HCGOVh3vNVEQxzk3E4mVl38cam9YWszZIu6TGRtH3DcsLc4mMqKnoRP23xzRJX4WkYjDfX/eVxM5qORsQAozkYgjk0yLZHgcuR87LC8SGZTL6NmqbA6FLdrd5S0iMg2VOBKLe5eZEYfOr66GoPObvmwOmCbFwfJopLM2CpsDB+TiWHl5qJ37vDjW/MBjhGmTlNscRe8FNIfgWU+NQ/MvyFSg+ZeqKm6Oap0+ZM90dhw8edwxeXoOm4Oby57mDaXSva1UufsQPzufOE69CMQneNmp83K5HbttjsX70C+j6N9WNpn6iHIunnGcfUFEmemxs2fh+P4u2M9bR+8jUBnFPY6yUh+xyihBv2Vfp+w+u3ZBg/bfHOXqZY4y8WvHqZC+RBwlbx9xyyilPHx6/Ox9DP9dvtgi09xLcC5acZR7y0BkrAlOoZKLo9y+WTjON+6Rv0kxjtLjYWLyoMMdcAvROEq/h82hQw9xkJfpxlF1fD/S8QJoHlV36nGUke9X3b9qpVxGCRFHifB5xgXiZZQocVRpEtHPolL5hLRFlJkeC3QWkTbHJugKCZRFFWlzbMJNucQ85pCbYxNihUTMooodRyWbSNwsqgxxbEQqid7EJlUclWMiabKoEsaxmVZJsiY2mePY6x5K1iD2VonjtRDfOfO1bhx4V8gPwTAHccBEHDARB0zEARNxwEQcMBEHTMQBE3HARBwwEQdMxAETccBEHDARB0zEARNxwEQcMBEHTMQBE3HARBwwEQdMxAETccBEHDARB0z/AJgt745VVj8ZAAAAAElFTkSuQmCC">
 <meta name="apple-mobile-web-app-title" content="Stunden & Kasse">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <title>Baustellen-Stunden & Kasse</title>
@@ -77,7 +80,7 @@ input,select{width:100%;font:inherit;padding:12px;border:1.5px solid var(--line)
 #print{display:none}
 @media print{body>*:not(#print){display:none!important}#print{display:block;padding:8mm;font:12px Barlow,Arial,sans-serif;color:#000}#print table{width:100%;border-collapse:collapse;margin-top:14px}#print th,#print td{border-bottom:1px solid #999;padding:5px 4px;text-align:left}#print td.n,#print th.n{text-align:right}#print h1{font-size:26px}}
 </style>
-<style>#auth{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto}</style>
+<style>#auth,#setup{position:fixed;inset:0;z-index:60;background:var(--bg);overflow:auto;padding-top:env(safe-area-inset-top,0px)}#setup{z-index:55}.g2>*{min-width:0}input[type=time],input[type=date]{min-width:0;max-width:100%;-webkit-appearance:none;appearance:none}</style>
 </head>
 <body>
 <div class="app">
@@ -118,6 +121,7 @@ input,select{width:100%;font:inherit;padding:12px;border:1.5px solid var(--line)
 </div></nav>
 
 <div id="auth"><div class="app" style="padding-top:48px"><h1 style="font-size:36px;line-height:1.05">Baustellen-Stunden & Kasse</h1><p class="note" style="font-size:15px">Melde dich an, damit deine Stunden sicher in der Cloud gespeichert sind.</p><div class="card"><label for="ae">E-Mail</label><input id="ae" type="email" autocomplete="email"><label for="ap">Passwort (mindestens 6 Zeichen)</label><input id="ap" type="password" autocomplete="current-password"><p class="note" id="am"></p><button class="btn go" id="ain">Anmelden</button><button class="btn ghost" id="aup" style="margin-top:10px">Neu registrieren</button></div></div></div>
+<div id="setup" style="display:none"><div class="app" style="padding-top:36px"><h1 style="font-size:34px">Willkommen</h1><p class="note" style="font-size:15px">Zwei kurze Angaben, dann kannst du gleich deine erste Zeit eintragen.</p><div class="card"><label for="sn">Dein Name</label><input id="sn" autocomplete="name"><label for="s1">Arbeitgeber 1</label><input id="s1" placeholder="Firmenname"><label for="r1">Stundenlohn in € (Arbeitgeber 1)</label><input id="r1" inputmode="decimal" placeholder="15,00"><label for="s2">Arbeitgeber 2 (optional)</label><input id="s2" placeholder="Firmenname"><label for="r2">Stundenlohn in € (Arbeitgeber 2)</label><input id="r2" inputmode="decimal" placeholder="20,00"><p class="note" id="sm"></p><button class="btn go" id="sgo">Speichern und loslegen</button></div></div></div>
 <div class="scrim" id="scrim"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div id="print"></div>
 
@@ -198,17 +202,18 @@ function entrySheet(e,fromTimer){
  <div class="g2"><div><label for="fs">Von</label><input type="time" id="fs" value="${e.start}"></div><div><label for="fe">Bis</label><input type="time" id="fe" value="${e.end}"></div></div>
  <label>Pause in Minuten</label><div class="wheel" id="wp"></div>
  <label for="ft">Tätigkeit</label><input id="ft" placeholder="z. B. Steckdosen angeschlossen" value="${esc(e.task||'')}">
- <label for="fo">Ort / Baustelle</label><input id="fo" placeholder="z. B. Schillerstraße 4" value="${esc(e.place||'')}">
+ <label for="fo">Ort / Baustelle (optional)</label><input id="fo" placeholder="z. B. Schillerstraße 4" value="${esc(e.place||'')}">
  <label for="fa">Arbeitgeber</label><select id="fa">${opts}</select>
  <p class="note" id="fn"></p>
  <div class="row2" style="margin-top:14px"><button class="btn ghost" onclick="closeSheet()">Abbrechen</button><button class="btn go" id="fsave" style="margin-top:0">Speichern</button></div>
  ${edit?'<button class="btn ghost open-t" id="fdel" style="margin-top:10px">Eintrag löschen</button>':''}`);
- wheel($('#wp'),steps(60),Math.round((e.pause||0)/5),v=>v+' Min.',calc);
+ wheel($('#wp'),steps(60),Math.round((e.pause||0)/5),v=>v+' Min.',()=>calc());
  const calc=()=>{const n=tm($('#fe').value)-tm($('#fs').value)-($('#wp')._v||0),r=emp($('#fa').value).rate;
   $('#fn').textContent=n>0?'Netto '+hh(n)+' · Verdienst '+eur(n/60*r):'Ende muss nach dem Start liegen.'};
  ['#fs','#fe','#fa'].forEach(s=>$(s).addEventListener('input',calc));calc();
  $('#fsave').onclick=()=>run(async()=>{const o={id:e.id||uid(),date:$('#fd').value,start:$('#fs').value,end:$('#fe').value,pause:$('#wp')._v||0,task:$('#ft').value.trim(),place:$('#fo').value.trim(),emp:$('#fa').value};
   if(!o.emp||!o.date||!o.start||!o.end||net(o)<=0){$('#fn').textContent='Bitte Datum, Zeiten und Arbeitgeber prüfen. Die Nettozeit muss über 0 liegen.';return}
+  if(!o.task&&!o.place){$('#fn').textContent='Bitte Tätigkeit oder Ort eintragen. Eines von beiden reicht.';return}
   o.rate=(edit&&e.emp===o.emp&&e.rate)?e.rate:emp(o.emp).rate;const{error}=await sb.from('time_entries').upsert({id:o.id,employer_id:o.emp,work_date:o.date,start_time:o.start,end_time:o.end,pause_minutes:o.pause,task:o.task,place:o.place,hourly_rate:o.rate});if(error)throw error;if(fromTimer){S.timer=null;save()}closeSheet();await loadAll();render()});
  if(edit)$('#fdel').onclick=()=>run(async()=>{const{error}=await sb.from('time_entries').delete().eq('id',e.id);if(error)throw error;closeSheet();await loadAll();render()})}
 $('#add').onclick=()=>{if(!S.employers.length)return alert('Lege zuerst unter Einstellungen einen Arbeitgeber an.');const n=new Date();entrySheet({date:todayIso(),start:'07:00',end:hm(n),pause:0})};
@@ -280,6 +285,16 @@ function render(){const f=fifo(),t=todayIso(),all=[...S.entries].sort((a,b)=>(b.
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===b));
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+b.dataset.v));window.scrollTo(0,0)});
+const gate=()=>{$('#setup').style.display=(S.uid&&(!S.name||!S.employers.length))?'block':'none';if(S.name&&!$('#sn').value)$('#sn').value=S.name};
+$('#sgo').onclick=()=>run(async()=>{
+ const sm=t=>$('#sm').textContent=t,n=$('#sn').value.trim(),
+  rows=[[$('#s1').value.trim(),$('#r1').value],[$('#s2').value.trim(),$('#r2').value]].filter(x=>x[0]).map(x=>({name:x[0],hourly_rate:parseFloat(x[1].replace(',','.'))}));
+ if(!n)return sm('Bitte deinen Namen eintragen.');
+ if(!rows.length&&!S.employers.length)return sm('Bitte mindestens einen Arbeitgeber eintragen.');
+ if(rows.some(r=>!(r.hourly_rate>0)))return sm('Bitte bei jedem Arbeitgeber einen Stundenlohn über 0 € eintragen.');
+ let x=await sb.from('profiles').upsert({user_id:S.uid,full_name:n});if(x.error)throw x.error;
+ if(rows.length){x=await sb.from('employers').insert(rows);if(x.error)throw x.error}
+ await loadAll();render();gate()});
 const am=t=>$('#am').textContent=t;
 async function doAuth(up){const email=$('#ae').value.trim(),password=$('#ap').value;
  if(!email||password.length<6)return am('Bitte E-Mail und ein Passwort mit mindestens 6 Zeichen eingeben.');
@@ -289,8 +304,8 @@ async function doAuth(up){const email=$('#ae').value.trim(),password=$('#ap').va
  if(up&&!r.data.session)am('Fast geschafft: Bestätige die E-Mail in deinem Postfach und melde dich dann an.')}
 $('#ain').onclick=()=>doAuth(false);$('#aup').onclick=()=>doAuth(true);
 sb.auth.onAuthStateChange((_e,ses)=>{
- if(ses){S.uid=ses.user.id;$('#auth').style.display='none';setTimeout(()=>run(async()=>{await loadAll();render()}),0)}
- else{S.uid=null;S.employers=[];S.entries=[];S.payments=[];S.name='';$('#auth').style.display='block';render()}});
+ if(ses){S.uid=ses.user.id;$('#auth').style.display='none';setTimeout(()=>run(async()=>{await loadAll();render();gate()}),0)}
+ else{S.uid=null;S.employers=[];S.entries=[];S.payments=[];S.name='';$('#auth').style.display='block';$('#setup').style.display='none';render()}});
 render();
 </script>
 </body>
